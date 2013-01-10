@@ -1,0 +1,11 @@
+# $Id$
+# quick build (for lazy programmers).  for more information on the
+# build process, see the README file.
+
+if [ "$1" = "clean" ]; then
+  python2.7 setup.py clean
+  rm -f *.so PIL/*.so
+fi
+
+python2.7 setup.py build_ext -i
+python2.7 selftest.py
