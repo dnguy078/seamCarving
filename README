@@ -1,0 +1,101 @@
+CS 141 Lab - Seam carving
+
+Note:
+
+   Each student should write their own code individually  and submit 
+   their own solution to the turn-in for grading.  So, don't use any
+   one else's code, and don't provide your code for anyone else to use.
+
+   You may still collaborate with other students in discussing ideas and 
+   in debugging.  (And if you do use an idea from another source, you 
+   should still cite that source.)
+
+
+Background on this lab:
+
+  http://www.youtube.com/watch?v=vIFCV2spKtg
+  http://en.wikipedia.org/wiki/Seam_carving
+
+Assignment:
+
+  Watch the youtube video above to get the idea of "seam carving".
+
+  Build the Python imaging library by using the following terminal commands:
+
+     cd ./Imaging-1.1.7
+     sh BUILDME
+     cd ..
+
+  The final output of the BUILDME command should be as follows:
+
+    Running selftest:
+    --- 57 tests passed.
+
+  Your assignment is to complete the program in the file carve.py, 
+  by completing the function find_min_energy_seam(image). Look for a line
+
+    # TODO: Your Implementation here
+
+
+  That function takes an image (of class Image(), defined in carve.py).
+  It should find and return a "minimum-energy seam" from the top row to the bottom row.  
+
+  A seam S is a kind of constrained path through the pixels of the image.
+  A seam is specified by an array S, reprenting a path through the pixels
+  with respective coordinates (0,S[0]), (1, S[1]), (2, S[2]), ..., (I, S[I]).
+  We say the seam starts at (0,S[0]) and ends at (I,S[I]), in row I.
+
+  The pixel that the seam goes through in row i must be either (i) directly below,
+  (ii) below and to the left, or (iii) below and to the right, of the pixel 
+  that the seam goes through in row i-1. That is, S must satisfy
+  |S[i] - S[i-1]| <= 1 for each i = 1,2,..,I.
+
+  The goal is to find a minimum-energy seam ending in any pixel on the bottom row.
+  Removal of that seam from the image will reduce the width of the image by 1,
+  while introducing a minimum amount of visual change in the image.  
+
+  Formally, we define the energy of the seam to be the sum, 
+  over the pixels (i,S[i]) in the seam, of the energy of the pixel (i,S[i]),
+  where the energy of pixel (i,j) in the image is the value returned by the member     
+  function image.energy(i,j) (of the Image() class, as defined in carve.py.  (This
+  is the sum, over the neighboring pixels, of the L2-distance between the 
+  rgb pair at the neighboring pixel and the rgb pair at the pixel (i,j).)
+
+  Your function find_min_energy_seam(image) will find a minimum-energy seam using
+  dynamic programming.  Define ME[i][j] to be the minimum energy of any seam starting 
+  in the top row and ending at pixel (i,j).  Then ME satisfies the following recurrence:
+
+    ME[0][j] = image.energy(0,j)    -- because the seam has to be just that one pixel
+  
+    and, for i > 0,
+
+    ME[i][j] = image_energy(i,j) + min( ME[i-1][j-1], ME[i-1][j], ME[i-1][j+1] ).
+
+  Your implementation of the function should use this recurrence to fill each entry
+  of the array ME[][] with the correct value.  As it does so, it should also record
+  the corresponding seams using parent pointers.  In particular, for i>0, it should set
+  parent[i][j] to be j', where j' is in {j-1, j, j+1} and the minimum-energy seam
+  ending at pixel (i,j) travels through (i-1, j') just before entering (i,j).
+
+  Once the parent pointers are computed, a minimum-energy seam can be found
+  and returned using the code fragments supplied in the function find_min_seam().
+
+TESTING:  Here are some sample outputs.  Presumably yours should be the same.
+
+	% ./carve.py inputs/girl.png
+	seam energy 9905
+	% ./carve.py inputs/lake.png
+	seam energy 183314
+	% ./carve.py inputs/tower.png
+	seam energy 193892
+
+  The numbers for jpg files may be machine dependent. 
+  carve.py also produces output files (in the ./input directory!).
+  You can compare some of those to the ones in ./sample-outputs.  But be aware that
+  there may be several different seams that all have minimum energy, so the
+  seams shown in sample-outputs might not agree with yours.
+
+TURN IN:
+
+  Once you are done, edit carve.py to set debug = False at the top of the file.
+  Then turn in just the single file carve.py.
